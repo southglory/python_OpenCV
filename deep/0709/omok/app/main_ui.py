@@ -106,6 +106,7 @@ class AppWindow(tk.Frame):#frame
             doll_size = 15
             self.frame.create_oval(self.hansu_x - doll_size, self.hansu_y - doll_size, self.hansu_x + doll_size,
                                    self.hansu_y + doll_size, fill=color)
+
         elif (cntL+cntR==2) or (cntU+cntB==2) or (cntUR1+cntUR2==2) or (cntBR1+cntBR2==2):
             print(color+": three!")
 
