@@ -16,15 +16,28 @@ class video_service():
         # CascadeClassifier xml 파일의 경로 #haarcascade_frontalface_alt2.xml
         cascade_file = 'classifier/haarcascade_frontalface_default.xml'
         self.cascade = cv2.CascadeClassifier(cascade_file)
+        self.flag_thread = None
 
+    def close(self):
+        self.app.destroy()
+        print(" video_service 종료.")
+        
+    def __del__(self):
 
-    def video_show(self):
+        print(" video_service 객체 소멸.")
+
+    def video_show(self,ID,Subject):
         global frame_kept
+        global flag_thread
+        self.flag_thread = True
+
         print("show")
         cap = cv2.VideoCapture(0)
         mask=cv2.imread('img/mask.png')
 
         while (cap.isOpened()):
+            if self.flag_thread==False:
+                break
             ret, frame = cap.read()
             if ret:
                 # 이미지 반전,  0:상하, 1 : 좌우
@@ -54,33 +67,45 @@ class video_service():
                         dst=frame_small[cy - int(ch / 2):cy + int(ch / 2), cx - int(cw / 2): cx + int(cw / 2)]
                         frame_kept= copy.deepcopy(dst)
                         cv2.imshow('img', frame_kept)
+
+                        if Subject =="User":
+                            self.face_recognition(ID)
+                        elif Subject =="Manager":
+                            pass
+
                     for face in face_list:
                         x, y, w, h = face
                         cv2.rectangle(frame, (x, y), (x + w, y + h), color, thickness=8)
                 else:
                     # print("no face")
                     frame_kept = None
-                    pass
 
                 # 영상 화면 띄우기
                 cv2.imshow('frame', cv2.resize(frame, (int(640 * 1.5), int(480 * 1.5))))
 
                 if cv2.waitKey(1) & 0xFF == ord('q'):  # 추가 종료 조건. q 누르기
                     break
+        if self.flag_thread == True:
+            self.btn2_clicked()  # 학습창 종료버튼 눌림
+
+        # 외부에서 flag로 Thread를 종료하는 경우, 이미 학습창도 종료했으므로 종료버튼을 누를 필요 없음.
         cap.release()
         cv2.destroyAllWindows()
-        self.btn2_clicked()#학습창 종료버튼 눌림
         print('\nth exiting.')
 
-    def video_GUI(self,ID):
+
+    def video_GUI(self,ID,Subject):
         print("video GUI 시작.")
         self.ID=ID
         self.newWindow = tk.Toplevel(self.app)
         self.newWindow.geometry('%dx%d+%d+%d' % (500,400, 10, 220))
         self.cnt_learn=0
-        self.create_mini_widgets()
+        if Subject =="Manager":
+            self.create_mini_widgets()
+        elif Subject =="User":
+            self.create_user_mini_widgets()
 
-
+    ######################관리자 기능###########################
     def create_mini_widgets(self):
 
         self.btn1 = tk.Button(self.newWindow, width=30, font=100, text='5회 학습')
@@ -110,6 +135,9 @@ class video_service():
     def btn2_clicked(self):
         print("mini_btn2_clicked")
         print("학습창 닫기")
+        self.close_new_window()
+
+    def close_new_window(self):
         self.newWindow.destroy()
 
     def write_frame(self,ID):
@@ -124,5 +152,42 @@ class video_service():
                 os.mkdir(pngDir)
             cv2.imwrite(pngDir+'/At'+datetime.now().strftime('%Y%m%d_%H%M%S')+'.png', frame_kept)
             return True
+
+
+
+    ############################유저 기능##############################
+    def user_video_GUI(self, ID):
+        print("video GUI 시작.")
+        self.ID = ID
+        self.newWindow = tk.Toplevel(self.app)
+        self.newWindow.geometry('%dx%d+%d+%d' % (500, 400, 10, 220))
+        self.cnt_learn = 0
+        self.create_user_mini_widgets()
+
+    def create_user_mini_widgets(self):
+        self.label1 = tk.Label(self.newWindow, font=100, text="출석체크 창")
+        self.label1.grid(row=1, column=0, columnspan=2)
+        self.label2 = tk.Label(self.newWindow,image=None)
+        self.label2.grid(row=2, column=0, columnspan=2)
+        self.user_btn1 = tk.Button(self.newWindow, width=30, font=100, text='닫기')
+        self.user_btn1.grid(row=3, column=0, columnspan=2)
+
+        # app.btn1['command'] = btn1_clicked
+        self.user_btn1['command'] = self.user_btn1_clicked
+
+    def face_recognition(self,ID):
+        print(ID+"recognized")
+        return True
+
+
+
+    def label_change(self):
+        global frame_kept
+        self.label2.config(image=frame_kept)
+
+    def user_btn1_clicked(self):
+        print("user_mini_btn2_clicked")
+        print("출석체크 창 닫기")
+        self.close_new_window()
 
 

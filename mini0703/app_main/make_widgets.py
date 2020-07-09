@@ -1,13 +1,13 @@
 import tkinter as tk
-import app_sub0.main as sub0
 import app_sub1.main as sub1
+import threading
 from functools import partial
 
 def remove_ent(app):
     app.ent1.delete(0, 'end')
     app.ent2.delete(0, 'end')
 
-def btn1_clicked(app,service2,event):
+def btn1_clicked(app,service2,service3,event):
     print('btn1 clicked')
     ID=app.ent1.get()
     name=app.ent2.get()
@@ -16,8 +16,15 @@ def btn1_clicked(app,service2,event):
         print("없는 학번")
     elif name==id_selection.name:
         print("출석을 해주세요")
-        sub0.main()
+        service3.video_GUI(ID,"User")
+        print('btn1 clicked: video_show threading')
+        video_showing = threading.Thread(target=service3.video_show, args=(ID,"User"))
+        video_showing.start()
+
         service2.update(ID)
+        print(service2.time(ID),'등입니다.')
+
+
     else:
         print("없는 이름")
     remove_ent(app)
@@ -29,7 +36,10 @@ def btn2_clicked(app,event):
     sub1.main()
 
 
-def make(app, service,service2):
+
+
+
+def make(app,service2,service3):
     app.label1= tk.Label(app.sub_fr, text = "학번:",font=60)
     app.label2 = tk.Label(app.sub_fr, text="이름:",font=60)
     app.ent1 = tk.Entry(app.sub_fr, width=30)
@@ -49,6 +59,6 @@ def make(app, service,service2):
 
 
     #app.btn1['command'] = btn1_clicked
-    app.btn1.bind('<Button-1>', partial(btn1_clicked, app,service2))
+    app.btn1.bind('<Button-1>', partial(btn1_clicked, app,service2,service3))
     app.btn2.bind('<Button-1>', partial(btn2_clicked, app))
 
