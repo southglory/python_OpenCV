@@ -58,8 +58,8 @@ class AppWindow(tk.Frame):#frame
 
         self.hansu_x=int(round(x * 0.1) * 10)
         self.hansu_y=int(round(y * 0.1) * 10)
-        self.hansu_x_arr= int(self.hansu_x/30-1)
-        self.hansu_y_arr= int(self.hansu_y/30-1)
+        self.hansu_x_arr= int(self.hansu_x/30)
+        self.hansu_y_arr= int(self.hansu_y/30)
         if self.test_availability()==True:
             print(self.hansu_x_arr,self.hansu_y_arr)
             self.put_doll(self.player[self.turn])#돌 놓기
@@ -105,6 +105,9 @@ class AppWindow(tk.Frame):#frame
             #승리 지점 표시
             doll_size = 15
             self.frame.create_oval(self.hansu_x - doll_size, self.hansu_y - doll_size, self.hansu_x + doll_size,
+                                   self.hansu_y + doll_size, fill="red")
+            doll_size = 10
+            self.frame.create_oval(self.hansu_x - doll_size, self.hansu_y - doll_size, self.hansu_x + doll_size,
                                    self.hansu_y + doll_size, fill=color)
 
         elif (cntL+cntR==2) or (cntU+cntB==2) or (cntUR1+cntUR2==2) or (cntBR1+cntBR2==2):
@@ -115,16 +118,16 @@ class AppWindow(tk.Frame):#frame
     def AI_mode(self):
         positions=[]
         #[[1,2],[1,3]..]
-        for i in range(1,19+1):
-            for j in range(1,19+1):
+        for i in range(0,18+1):
+            for j in range(0,18+1):
                 positions.append([i,j])
         print(positions)
         print("3")
-        time.sleep(1)
+        time.sleep(0.5)
         print("2")
-        time.sleep(1)
+        time.sleep(0.5)
         print("1")
-        time.sleep(1)
+        time.sleep(0.5)
         print("start!")
         while self.Flag==False:
             self.AI_choice=random.sample(positions,1)
