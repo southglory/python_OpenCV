@@ -2,8 +2,9 @@ import tkinter as tk
 import omok.app.main_ui as win
 import omok.app.make_widgets as mkw
 import omok.app.service as s
-
+app=None
 def main():
+    global app
     root = tk.Tk()
     app = win.AppWindow(root)
 

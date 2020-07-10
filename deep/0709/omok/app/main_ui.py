@@ -5,10 +5,13 @@ import cv2
 from PIL import Image
 from PIL import ImageTk
 import numpy as np
+import omok.app.main as om
+
 
 class AppWindow(tk.Frame):#frame
     def __init__(self, master=None):
         super().__init__(master)
+        self.AI_loop_flag = None
         self.master = master
         self.master.geometry('1000x700+50+50')
         self.master.resizable(True, True)
@@ -118,25 +121,60 @@ class AppWindow(tk.Frame):#frame
     def AI_mode(self):
         positions=[]
         #[[1,2],[1,3]..]
-        for i in range(0,18+1):
-            for j in range(0,18+1):
-                positions.append([i,j])
-        print(positions)
-        print("3")
-        time.sleep(0.5)
-        print("2")
-        time.sleep(0.5)
-        print("1")
-        time.sleep(0.5)
-        print("start!")
-        while self.Flag==False:
-            self.AI_choice=random.sample(positions,1)
-            #print(self.AI_choice)
-            positions.remove(self.AI_choice[0])
-            #print(len(positions))
-            time.sleep(0)
-            self.make_hansu(AI=True, Ax=self.AI_choice[0][0], Ay=self.AI_choice[0][1])
+        app=om.app
+        if self.AI_loop_flag==-1:#not loop
+            for i in range(0,18+1):
+                for j in range(0,18+1):
+                    positions.append([i,j])
+            print(positions)
+            print("3")
+            time.sleep(0.5)
+            print("2")
+            time.sleep(0.5)
+            print("1")
+            time.sleep(0.5)
+            print("start!")
+            while self.Flag==False:
+                self.AI_choice=random.sample(positions,1)
+                #print(self.AI_choice)
+                positions.remove(self.AI_choice[0])
+                #print(len(positions))
+                self.make_hansu(AI=True, Ax=self.AI_choice[0][0], Ay=self.AI_choice[0][1])
+            time.sleep(1)
+        else:
+            while self.AI_loop_flag==1:#loop
+                for i in range(0,18+1):
+                    for j in range(0,18+1):
+                        positions.append([i,j])
+                print(positions)
+                print("3")
+                time.sleep(0.5)
+                print("2")
+                time.sleep(0.5)
+                print("1")
+                time.sleep(0.5)
+                print("start!")
+                while self.Flag==False:
+                    self.AI_choice=random.sample(positions,1)
+                    #print(self.AI_choice)
+                    positions.remove(self.AI_choice[0])
+                    #print(len(positions))
+                    self.make_hansu(AI=True, Ax=self.AI_choice[0][0], Ay=self.AI_choice[0][1])
+                print("AI again")
+
+                time.sleep(1)
+                app.make_board_Graphic()
+                app.make_board_game()
+                print("AI")
+                if app.lbl1['text'] == "gray mode":
+                    app.turn_plus = 0
+                elif app.lbl1['text'] == "black vs. white":
+                    app.turn_plus = -1
+                app.lbl2['text'] = "AI"
+                app.make_turn()
         print("AI quit")
+
+
 
 
 
